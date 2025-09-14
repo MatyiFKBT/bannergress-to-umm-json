@@ -11,18 +11,16 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7.30.0
-      - name: Use Node.js 16
+      - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-          cache: 'pnpm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
       - name: Install depedencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
       - name: Build project
-        run: pnpm build
+        run: bun run build
 
       - uses: softprops/action-gh-release@v1
         with:
