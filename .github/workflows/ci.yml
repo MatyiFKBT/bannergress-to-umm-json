@@ -1,0 +1,31 @@
+name: "automatic-release"
+
+on:
+  push:
+    branches:
+      - "master"
+jobs:
+  release:
+    name: "Release"
+    runs-on: "ubuntu-latest"
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.30.0
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'pnpm'
+      - name: Install depedencies
+        run: pnpm install --frozen-lockfile
+      - name: Build project
+        run: pnpm build
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          tag_name: latest
+          prerelease: true
