@@ -9,7 +9,7 @@ export default defineConfig({
       entry: 'src/main.ts',
       userscript: {
         name: 'Bannergress to UMM Downloader',
-        icon: 'https://bannergress.com/favicon.ico',
+        icon: 'https://bannergress.com/favicons/favicon-96.png',
         namespace: 'matyifkbt/bannergress-to-umm-json',
         match: ['https://bannergress.com/banner/*'],
         version: `v${new Date().getTime()}`,

@@ -48,7 +48,7 @@ function convertToUMM(banner: BannergressBanner): UMMissionSet {
           longitude: step.poi.longitude,
         },
         title: step.poi.title,
-        type: "PORTAL",
+        type: "PORTAL" as "PORTAL",
         objective: {
           type: mapObjective(step.objective),
         },
@@ -57,9 +57,41 @@ function convertToUMM(banner: BannergressBanner): UMMissionSet {
   };
 }
 
-function addDownloadButton() {
+function convertToUMMReversed(banner: BannergressBanner): UMMissionSet {
+  const missions = Object.values(banner.missions).reverse();
+  return {
+    missionSetName: banner.title,
+    missionSetDescription: banner.description,
+    currentMission: 0,
+    plannedBannerLength: banner.numberOfMissions.toString(),
+    titleFormat: "T (N/M)",
+    fileFormatVersion: 2,
+    missions: missions.map((mission) => ({
+      missionTitle: mission.title,
+      missionDescription: banner.description,
+      portals: mission.steps.map((step) => ({
+        description: "",
+        guid: step.poi.id,
+        imageUrl: step.poi.picture,
+        isOrnamented: false,
+        isStartPoint: false,
+        location: {
+          latitude: step.poi.latitude,
+          longitude: step.poi.longitude,
+        },
+        title: step.poi.title,
+        type: "PORTAL" as "PORTAL",
+        objective: {
+          type: mapObjective(step.objective),
+        },
+      })).reverse(),
+    })),
+  };
+}
+
+function addDownloadButtons() {
   if (document.getElementById("umm-download-button")) {
-    return; // Button already exists
+    return; // Buttons already exist
   }
 
   const buttonContainer = document.querySelector(".banner-info-card");
@@ -106,6 +138,49 @@ function addDownloadButton() {
     });
 
     buttonContainer.appendChild(downloadButton);
+
+    const downloadButtonReversed = document.createElement("button");
+    downloadButtonReversed.id = "umm-download-button-reversed";
+    downloadButtonReversed.textContent = "Download UMM JSON (Reversed)";
+    downloadButtonReversed.className = "banner-info-button"; // Use bannergress's button style
+    downloadButtonReversed.style.marginTop = "1em";
+
+    downloadButtonReversed.addEventListener("click", () => {
+      const bannerId = window.location.pathname.split("/").pop();
+      if (!bannerId) {
+        alert("Could not extract banner ID from URL.");
+        return;
+      }
+
+      GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://api.bannergress.com/bnrs/${bannerId}`,
+        responseType: "json",
+        onload: (response) => {
+          if (response.status === 200) {
+            const bannerData = response.response as BannergressBanner;
+            const ummJson = convertToUMMReversed(bannerData);
+            const ummString = JSON.stringify(ummJson, null, 2);
+            const blob = new Blob([ummString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${bannerData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_reversed.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          } else {
+            alert(`Error fetching banner data: ${response.statusText}`);
+          }
+        },
+        onerror: (error) => {
+          alert(`An error occurred: ${error.error}`);
+        },
+      });
+    });
+
+    buttonContainer.appendChild(downloadButtonReversed);
   }
 }
 
@@ -114,7 +189,7 @@ const observer = new MutationObserver(() => {
   if (window.location.pathname.startsWith("/banner/")) {
     const bannerCard = document.querySelector('.banner-info-card');
     if (bannerCard) {
-      addDownloadButton();
+      addDownloadButtons();
     }
   } 
 });
