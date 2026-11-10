@@ -1,12 +1,6 @@
-import { BannerControllerApi, Configuration, ResponseError } from "bannergress-api";
+import { getBanner } from "./api";
 import { convertToUMM, convertToUMMReversed } from "./convert";
 import type { UMMissionSet } from "./types/umm";
-
-// The generated client defaults to http://, which browsers block as mixed
-// content when the userscript runs on https://bannergress.com.
-const api = new BannerControllerApi(
-  new Configuration({ basePath: "https://api.bannergress.com" }),
-);
 
 function getBannerId(): string | null {
   const segments = window.location.pathname.split("/").filter(Boolean);
@@ -16,10 +10,6 @@ function getBannerId(): string | null {
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof ResponseError) {
-    return `${error.response.status} ${error.response.statusText}`;
-  }
-
   return error instanceof Error ? error.message : String(error);
 }
 
@@ -44,7 +34,7 @@ async function downloadBanner(reversed: boolean) {
   }
 
   try {
-    const banner = await api.get({ id: bannerId });
+    const banner = await getBanner(bannerId);
     const ummJson = reversed ? convertToUMMReversed(banner) : convertToUMM(banner);
     const baseName = banner.title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
     const fileName = `${baseName}${reversed ? "_reversed" : ""}.json`;
