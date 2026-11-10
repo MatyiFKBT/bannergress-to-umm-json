@@ -1,13 +1,14 @@
+import type { BannerDto } from "bannergress-api";
 import { describe, expect, it } from "vitest";
 import { convertToUMM, convertToUMMReversed, mapObjective } from "./convert";
-import { BannergressBanner } from "./types/bannergress";
 
-const banner: BannergressBanner = {
+const banner: BannerDto = {
   id: "banner-id",
   title: "Test Banner",
   description: "Test description",
   width: 2,
   numberOfMissions: 2,
+  type: "sequential",
   missions: {
     first: {
       id: "mission-1",
@@ -71,6 +72,9 @@ describe("convertToUMM", () => {
     expect(result.missions.map((mission) => mission.missionTitle)).toEqual([
       "Second Mission",
       "First Mission",
+    ]);
+    expect(result.missions[0].portals.map((portal) => portal.guid)).toEqual([
+      "portal-2",
     ]);
   });
 });

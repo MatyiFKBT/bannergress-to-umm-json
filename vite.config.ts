@@ -15,7 +15,6 @@ export default defineConfig({
         version: `v${new Date().getTime()}`,
         downloadURL: `https://github.com/${pkg.author.name}/${pkg.name}/releases/download/latest/index.user.js`,
 				updateURL: `https://github.com/${pkg.author.name}/${pkg.name}/releases/download/latest/index.meta.js`,
-        grant: ['GM_xmlhttpRequest', 'GM_download'],
       },
     }),
   ],

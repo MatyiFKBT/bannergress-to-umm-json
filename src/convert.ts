@@ -1,5 +1,5 @@
-import { BannergressBanner } from "./types/bannergress";
-import { UMMissionSet } from "./types/umm";
+import type { BannerDto, MissionDto, MissionStepDto, PoiDto } from "bannergress-api";
+import type { UMMission, UMMissionSet, UMPortal } from "./types/umm";
 
 export function mapObjective(objective: string): string {
   switch (objective) {
@@ -24,66 +24,65 @@ export function mapObjective(objective: string): string {
   }
 }
 
-export function convertToUMM(banner: BannergressBanner): UMMissionSet {
-  const missions = Object.values(banner.missions);
+function getPoi(step: MissionStepDto): PoiDto {
+  if (!step.poi) {
+    throw new Error("Mission step is missing its POI");
+  }
+
+  return step.poi;
+}
+
+function toPortal(step: MissionStepDto): UMPortal {
+  const poi = getPoi(step);
+
   return {
-    missionSetName: banner.title,
-    missionSetDescription: banner.description,
-    currentMission: 0,
-    plannedBannerLength: banner.numberOfMissions.toString(),
-    titleFormat: "T (N/M)",
-    fileFormatVersion: 2,
-    missions: missions.map((mission) => ({
-      missionTitle: mission.title,
-      missionDescription: banner.description,
-      portals: mission.steps.map((step) => ({
-        description: "",
-        guid: step.poi.id,
-        imageUrl: step.poi.picture,
-        isOrnamented: false,
-        isStartPoint: false,
-        location: {
-          latitude: step.poi.latitude,
-          longitude: step.poi.longitude,
-        },
-        title: step.poi.title,
-        type: "PORTAL" as "PORTAL",
-        objective: {
-          type: mapObjective(step.objective),
-        },
-      })),
-    })),
+    description: "",
+    guid: poi.id ?? "",
+    imageUrl: poi.picture,
+    isOrnamented: false,
+    isStartPoint: false,
+    location: {
+      latitude: poi.latitude ?? 0,
+      longitude: poi.longitude ?? 0,
+    },
+    title: poi.title,
+    type: "PORTAL",
+    objective: {
+      type: mapObjective(step.objective ?? "unknown"),
+    },
   };
 }
 
-export function convertToUMMReversed(banner: BannergressBanner): UMMissionSet {
-  const missions = Object.values(banner.missions).reverse();
+function toMission(mission: MissionDto, description: string, reversed: boolean): UMMission {
+  const steps = mission.steps ?? [];
+
+  return {
+    missionTitle: mission.title ?? "",
+    missionDescription: description,
+    portals: (reversed ? [...steps].reverse() : steps).map(toPortal),
+  };
+}
+
+function convert(banner: BannerDto, reversed: boolean): UMMissionSet {
+  const missions = Object.values(banner.missions ?? {});
+  const orderedMissions = reversed ? [...missions].reverse() : missions;
+  const description = banner.description ?? "";
+
   return {
     missionSetName: banner.title,
-    missionSetDescription: banner.description,
+    missionSetDescription: description,
     currentMission: 0,
-    plannedBannerLength: banner.numberOfMissions.toString(),
+    plannedBannerLength: (banner.numberOfMissions ?? missions.length).toString(),
     titleFormat: "T (N/M)",
     fileFormatVersion: 2,
-    missions: missions.map((mission) => ({
-      missionTitle: mission.title,
-      missionDescription: banner.description,
-      portals: mission.steps.map((step) => ({
-        description: "",
-        guid: step.poi.id,
-        imageUrl: step.poi.picture,
-        isOrnamented: false,
-        isStartPoint: false,
-        location: {
-          latitude: step.poi.latitude,
-          longitude: step.poi.longitude,
-        },
-        title: step.poi.title,
-        type: "PORTAL" as "PORTAL",
-        objective: {
-          type: mapObjective(step.objective),
-        },
-      })).reverse(),
-    })),
+    missions: orderedMissions.map((mission) => toMission(mission, description, reversed)),
   };
+}
+
+export function convertToUMM(banner: BannerDto): UMMissionSet {
+  return convert(banner, false);
+}
+
+export function convertToUMMReversed(banner: BannerDto): UMMissionSet {
+  return convert(banner, true);
 }
