@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
-import { author, name } from './package.json';
+import pkg from './package.json' with { type: 'json' };
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,8 +13,8 @@ export default defineConfig({
         namespace: 'matyifkbt/bannergress-to-umm-json',
         match: ['https://bannergress.com/banner/*'],
         version: `v${new Date().getTime()}`,
-        downloadURL: `https://github.com/${author.name}/${name}/releases/download/latest/index.user.js`,
-				updateURL: `https://github.com/${author.name}/${name}/releases/download/latest/index.meta.js`,
+        downloadURL: `https://github.com/${pkg.author.name}/${pkg.name}/releases/download/latest/index.user.js`,
+				updateURL: `https://github.com/${pkg.author.name}/${pkg.name}/releases/download/latest/index.meta.js`,
         grant: ['GM_xmlhttpRequest', 'GM_download'],
       },
     }),
