@@ -1,21 +1,24 @@
 {
+  "name": "bannergress-to-umm-json",
+  "version": "0.0.0",
   "author": {
     "name": "matyifkbt"
-  },
-  "name": "bannergress-to-umm-json",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "7.0.2",
     "vite": "8.3.6",
     "vite-plugin-monkey": "8.1.1",
     "vitest": "5.1.0"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "type": "module",
+  "dependencies": {
+    "bannergress-api": "0.2.0"
   }
 }
