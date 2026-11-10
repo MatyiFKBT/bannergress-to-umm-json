@@ -1,4 +1,4 @@
-import type { BannerDto, MissionDto, MissionStepDto, PoiDto } from "./api";
+import type { BannerDto, MissionDto, MissionStepDto, PoiDto } from "bannergress-api";
 import type { UMMission, UMMissionSet, UMPortal } from "./types/umm";
 
 export function mapObjective(objective: string): string {

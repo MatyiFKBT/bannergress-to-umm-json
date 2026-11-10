@@ -1,4 +1,4 @@
-import type { BannerDto } from "./api";
+import type { BannerDto } from "bannergress-api";
 import { describe, expect, it } from "vitest";
 import { convertToUMM, convertToUMMReversed, mapObjective } from "./convert";
 

@@ -17,5 +17,8 @@
     "preview": "vite preview",
     "test": "vitest run"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "bannergress-api": "^1.0.0"
+  }
 }

@@ -1,4 +1,4 @@
-import { getBanner } from "./api";
+import { getBanner } from "bannergress-api";
 import { convertToUMM, convertToUMMReversed } from "./convert";
 import type { UMMissionSet } from "./types/umm";
 
